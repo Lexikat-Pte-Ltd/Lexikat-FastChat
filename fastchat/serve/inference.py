@@ -1,5 +1,5 @@
 """Inference for FastChat models."""
-import abc
+import abc,time
 import gc
 import json
 import math
@@ -68,6 +68,7 @@ def generate_stream(
     stream_interval: int = 2,
     judge_sent_end: bool = False,
 ):
+    
     if hasattr(model, "device"):
         device = model.device
 
@@ -119,7 +120,12 @@ def generate_stream(
     sent_interrupt = False
     finish_reason = None
     stopped = False
+
+    start_timer = time.time()
     for i in range(max_new_tokens):
+        how_long =  time.time() - start_timer
+        if how_long > params.request_timeout:
+            stopped=True
         if i == 0:  # prefill
             if model.config.is_encoder_decoder:
                 out = model.decoder(
