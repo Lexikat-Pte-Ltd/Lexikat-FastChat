@@ -124,7 +124,7 @@ def generate_stream(
     start_timer = time.time()
     for i in range(max_new_tokens):
         how_long =  time.time() - start_timer
-        if how_long > params.request_timeout:
+        if how_long > params.get('request_timeout',120):
             stopped=True
         if i == 0:  # prefill
             if model.config.is_encoder_decoder:
